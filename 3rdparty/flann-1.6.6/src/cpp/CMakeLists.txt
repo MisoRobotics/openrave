@@ -16,7 +16,7 @@ set_target_properties(flann_cpp_s PROPERTIES COMPILE_FLAGS -fPIC)
 
 if(CMAKE_SYSTEM_NAME STREQUAL "Linux" AND CMAKE_COMPILER_IS_GNUCC)
     add_library(flann_cpp SHARED "")
-    target_link_libraries(flann_cpp -Wl,-whole-archive flann_cpp_s -Wl,-no-whole-archive)
+    target_link_libraries(flann_cpp PUBLIC -Wl,-whole-archive flann_cpp_s -Wl,-no-whole-archive)
     set_target_properties(flann_cpp PROPERTIES LINKER_LANGUAGE CXX) # have to do this manually for cmake 2.6
 else()
     add_library(flann_cpp SHARED ${CPP_SOURCES})
@@ -25,7 +25,7 @@ endif()
 set_target_properties(flann_cpp PROPERTIES
    VERSION ${FLANN_VERSION}
    SOVERSION ${FLANN_SOVERSION}
-) 
+)
 
 if (BUILD_C_BINDINGS)
     add_library(flann_s STATIC ${C_SOURCES})
@@ -33,7 +33,7 @@ if (BUILD_C_BINDINGS)
 
     if(CMAKE_SYSTEM_NAME STREQUAL "Linux" AND CMAKE_COMPILER_IS_GNUCC)
         add_library(flann SHARED "")
-        target_link_libraries(flann -Wl,-whole-archive flann_s -Wl,-no-whole-archive)
+        target_link_libraries(flann PUBLIC -Wl,-whole-archive flann_s -Wl,-no-whole-archive)
         set_target_properties(flann PROPERTIES LINKER_LANGUAGE C) # have to do this manually for cmake 2.6
     else()
         add_library(flann SHARED ${C_SOURCES})
@@ -42,7 +42,7 @@ if (BUILD_C_BINDINGS)
     set_target_properties(flann PROPERTIES
        VERSION ${FLANN_VERSION}
        SOVERSION ${FLANN_SOVERSION}
-    ) 
+    )
 endif()
 
 

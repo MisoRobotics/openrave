@@ -30,7 +30,7 @@ if(ODE_LIBRARY_FOUND)
 
   include_directories(${ODE_INCLUDE_DIRS})
   add_library(oderave SHARED oderave.cpp odecollision.h odephysics.h odespace.h odecontroller.h plugindefs.h)
-  
+
   # test for ode version 0.10
   check_cxx_source_compiles("
     #include <ode/ode.h>
@@ -43,18 +43,18 @@ if(ODE_LIBRARY_FOUND)
     NEED_TRIINDEX)
   set(CMAKE_REQUIRED_FLAGS)
   set(CMAKE_REQUIRED_INCLUDES)
-  
+
   if( NEED_TRIINDEX )
     set(ODE_CXXFLAGS "${ODE_CXXFLAGS} -DNEED_DTRIINDEX_TYPEDEF")
   endif()
 
   message(STATUS "ODE found, building oderave plugin, precision=${ODE_PRECISION}")
 
-  target_link_libraries(oderave libopenrave ${ODE_LIBRARY})
+  target_link_libraries(oderave PUBLIC libopenrave ${ODE_LIBRARY})
   target_link_libraries(oderave PRIVATE boost_assertion_failed)
   set_target_properties(oderave PROPERTIES COMPILE_FLAGS "${PLUGIN_COMPILE_FLAGS} ${ODE_CXXFLAGS}" LINK_FLAGS "${PLUGIN_LINK_FLAGS}")
   install(TARGETS oderave DESTINATION ${OPENRAVE_PLUGINS_INSTALL_DIR} COMPONENT ${COMPONENT_PREFIX}plugin-oderave)
-  
+
   if( MSVC )
     # have to install the DLLs
     install(DIRECTORY "${ODE_LINK_DIRS}/" DESTINATION bin COMPONENT ${COMPONENT_PREFIX}plugin-oderave FILES_MATCHING PATTERN "*-${MSVC_PREFIX}-*.dll")

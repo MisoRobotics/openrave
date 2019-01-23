@@ -6,7 +6,7 @@
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
 #     http://www.apache.org/licenses/LICENSE-2.0
-# 
+#
 # Unless required by applicable law or agreed to in writing, software
 # distributed under the License is distributed on an "AS IS" BASIS,
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -30,7 +30,7 @@ except ImportError:
         openravepy_path = openrave_config.communicate()
         if openrave_config.returncode != 0:
             raise OSError('bad args')
-            
+
         sys.path.append(openravepy_path[0].strip())
     except OSError:
         from distutils.sysconfig import get_python_lib
@@ -76,7 +76,7 @@ public:
                         "This is an example command");
     }
     virtual ~%(name)s() {}
-    
+
     bool MyCommand(std::ostream& sout, std::istream& sinput)
     {
         std::string input;
@@ -125,7 +125,7 @@ InterfaceBasePtr CreateInterfaceValidated(InterfaceType type, const std::string&
 // called to query available plugins
 void GetPluginAttributesValidated(PLUGININFO& info)
 {
-%s    
+%s
 }
 
 // called before plugin is terminated
@@ -152,13 +152,13 @@ link_directories(${OpenRAVE_LIBRARY_DIRS} ${Boost_LIBRARY_DIRS})
     if options.usecore:
         CMakeLists_txt += """add_executable(%(pluginname)s %(pluginname)s.cpp)
 set_target_properties(%(pluginname)s PROPERTIES COMPILE_FLAGS "${OpenRAVE_CXX_FLAGS}" LINK_FLAGS "${OpenRAVE_LINK_FLAGS}")
-target_link_libraries(%(pluginname)s ${OpenRAVE_CORE_LIBRARIES})
+target_link_libraries(%(pluginname)s PUBLIC ${OpenRAVE_CORE_LIBRARIES})
 install(TARGETS %(pluginname)s DESTINATION .)
 """%args
     else:
         CMakeLists_txt += """add_library(%(pluginname)s SHARED %(pluginname)s.cpp)
 set_target_properties(%(pluginname)s PROPERTIES COMPILE_FLAGS "${OpenRAVE_CXX_FLAGS}" LINK_FLAGS "${OpenRAVE_LINK_FLAGS}")
-target_link_libraries(%(pluginname)s ${OpenRAVE_LIBRARIES})
+target_link_libraries(%(pluginname)s PUBLIC ${OpenRAVE_LIBRARIES})
 install(TARGETS %(pluginname)s DESTINATION .)
 """%args
 
@@ -203,7 +203,7 @@ python testplugin.py
 
     try:
         os.makedirs(plugindir)
-        
+
     except OSError:
         pass
     open(os.path.join(plugindir,pluginname.lower()+'.cpp'),'w').write(code_cpp)
@@ -213,20 +213,20 @@ python testplugin.py
 
     try:
         os.makedirs(os.path.join(plugindir,'scenes'))
-        
+
     except OSError:
         pass
 
     open(os.path.join(plugindir,'scenes','myscene.env.xml'),'w').write(scene_xml)
     try:
         os.makedirs(os.path.join(plugindir,'robots'))
-        
+
     except OSError:
         pass
-    
+
     open(os.path.join(plugindir,'robots','myrobot.robot.xml'),'w').write(robot_xml)
     open(os.path.join(plugindir,'FindOpenRAVE.cmake'),'w').write("""@FindOpenRAVE@""")
-    
+
     if not options.usecore:
         testplugin_py="""#!/usr/bin/env @PYTHON_EXECUTABLE_NAME@
 from openravepy import *

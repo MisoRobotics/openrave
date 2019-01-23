@@ -15,7 +15,7 @@ if( OPT_BULLET )
 
       #message(STATUS "Bullet found ${bullet_INCLUDE_DIRS}, libs: ${bullet_LIBRARIES}, cflags=${bullet_CFLAGS_OTHER}, lflags=${bullet_LDFLAGS_OTHER}, building bulletrave plugin")
 
-      target_link_libraries(bulletrave libopenrave ${bullet_LIBRARIES})
+      target_link_libraries(bulletrave PUBLIC libopenrave ${bullet_LIBRARIES})
       target_link_libraries(bulletrave PRIVATE boost_assertion_failed)
 
       # for some reason the flags come out as a list, so convert to a string
@@ -35,7 +35,7 @@ if( OPT_BULLET )
   else()
     message(STATUS "Could not find Bullet Physics/Collision engine. Please install ver 2.80 from http://www.bulletphysics.com")
   endif()
-  
+
   set(CPACK_COMPONENT_${COMPONENT_PREFIX_UPPER}PLUGIN-BULLETRAVE_DISPLAY_NAME "Plugin for Bullet Collision/Physics" PARENT_SCOPE)
   set(PLUGIN_COMPONENT ${COMPONENT_PREFIX}plugin-bulletrave PARENT_SCOPE)
 endif()
