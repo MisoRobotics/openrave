@@ -25,7 +25,7 @@ class RunExample(object):
         self.name=name
         self.args=args
         self.description = 'test_programs.example.%s.%s'%(name,docname)
-            
+
     def __call__(self):
         # turn off trajectory validation for now
         RaveSetDebugLevel(RaveGetDebugLevel())
@@ -36,17 +36,17 @@ class RunExample(object):
 #     yield RunExample('hanoi', 'default',[])
 #     yield RunExample('calibrationviews', 'default',['--noshowsensor'])
 #     yield RunExample('graspplanning', 'default', [])
-# 
+#
 # class RunDatabase(object):
 #     def __init__(self,name,docname,args=[]):
 #         self.name=name
 #         self.args=args
 #         self.description = 'test_programs.database.%s.%s'%(name,docname)
-#             
+#
 #     def __call__(self):
 #         database = getattr(databases,self.name)
 #         database.run(args=args+["--viewer="])
-# 
+#
 # def test_databases():
 #     """test if all the databases run on default parameters"""
 #     yield RunDatabase('kinematicreachability', 'wam', ['--robot=robots/barrettwam.robot.xml','--quatdelta=1','--xyzdelta=0.2'])
@@ -57,7 +57,7 @@ class RunExample(object):
 #     yield RunDatabase('grasping', 'barrett', ['--robot=robots/barrettwam.robot.xml','--target=data/mug2.kinbody.xml','--boxdelta=0.1'])
 #     yield RunDatabase('grasping', 'barrett_multi', ['--robot=robots/barrettwam.robot.xml','--target=data/mug2.kinbody.xml','--boxdelta=0.1','--numthreads=2'])
 #     yield RunDatabase('inversekinematics', 'wam', ['--robot=robots/barrettwam.robot.xml','--iktests=100'])
-        
+
 #     yield run_database, 'inversereachability', ['--robot=robots/barrettwam.robot.xml']
 #     yield run_database, 'grasping', ['--robot=robots/pr2-beta-static.zae','--manipname=leftarm','--target=data/box_frootloops.kinbody.xml','--boxdelta=0.05']
 #     yield run_database, 'visibilitymodel', ['--robot=robots/pa10schunk.robot.xml','--target=data/box_frootloops.kinbody.xml']
@@ -126,7 +126,7 @@ include_directories(${OpenRAVE_INCLUDE_DIRS} ${Boost_INCLUDE_DIRS})
 link_directories(${OpenRAVE_LIBRARY_DIRS} ${Boost_LIBRARY_DIRS})
 add_executable(%(name)s %(name)s.cpp)
 set_target_properties(%(name)s PROPERTIES COMPILE_FLAGS "${OpenRAVE_CXX_FLAGS}" LINK_FLAGS "${OpenRAVE_LINK_FLAGS}")
-target_link_libraries(%(name)s ${OpenRAVE_LIBRARIES})
+target_link_libraries(%(name)s PUBLIC ${OpenRAVE_LIBRARIES})
 install(TARGETS %(name)s DESTINATION .)
 """%{'name':name}
         with open(os.path.join(name,'CMakeLists.txt'),'w') as f:
@@ -136,11 +136,11 @@ install(TARGETS %(name)s DESTINATION .)
     finally:
         os.chdir(curdir)
         shutil.rmtree(name)
-        
+
 def test_cppexamples():
     programdir = CompileProject(os.path.join('..','src','cppexamples'))
     shutil.rmtree(programdir)
-        
+
 def test_cppgeometry_standalone():
     cppdata="""#include <openrave/geometry.h>
 using namespace OpenRAVE::geometry;
@@ -151,7 +151,7 @@ int main()
 }
     """
     CompileRunCPP('testgeometry',cppdata)
-        
+
 def test_cpputils_standalone():
     cppdata="""#include <openrave/utils.h>
 #include <iostream>
@@ -165,7 +165,7 @@ int main()
 }
     """
     CompileRunCPP('testutils',cppdata)
-    
+
 def test_createplugin():
     curdir = os.getcwd()
     try:
@@ -181,7 +181,7 @@ def test_createplugin():
     finally:
         os.chdir(curdir)
         shutil.rmtree('myplugin')
-        
+
     try:
         shutil.rmtree('myprogram')
     except:

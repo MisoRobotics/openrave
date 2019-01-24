@@ -35,7 +35,7 @@ macro(find_hdf5)
     set( HDF5_IS_PARALLEL FALSE )
     foreach( _dir ${HDF5_INCLUDE_DIRS} )
         if( EXISTS "${_dir}/H5pubconf.h" )
-            file( STRINGS "${_dir}/H5pubconf.h" 
+            file( STRINGS "${_dir}/H5pubconf.h"
                 HDF5_HAVE_PARALLEL_DEFINE
                 REGEX "HAVE_PARALLEL 1" )
             if( HDF5_HAVE_PARALLEL_DEFINE )
@@ -52,7 +52,7 @@ endmacro(find_hdf5)
 macro(flann_add_gtest exe)
     # add build target
     add_executable(${exe} EXCLUDE_FROM_ALL ${ARGN})
-    target_link_libraries(${exe} gtest)
+    target_link_libraries(${exe} PUBLIC gtest)
     # add dependency to 'tests' target
     add_dependencies(tests ${exe})
 
@@ -80,7 +80,7 @@ macro(flann_add_pyunit file)
 
     # find python
     find_package(PythonInterp REQUIRED)
-    
+
     # add target for running test
     string(REPLACE "/" "_" _testname ${file})
     add_custom_target(pyunit_${_testname}
@@ -97,10 +97,10 @@ endmacro(flann_add_pyunit)
 
 macro(flann_download_test_data _name _md5)
     string(REPLACE "/" "_" _dataset_name dataset_${_name})
-    
+
     # find python
     find_package(PythonInterp REQUIRED)
-    
+
     add_custom_target(${_dataset_name}
         COMMAND ${PROJECT_SOURCE_DIR}/bin/download_checkmd5.py http://people.cs.ubc.ca/~mariusm/uploads/FLANN/datasets/${_name} ${TEST_OUTPUT_PATH}/${_name} ${_md5}
         VERBATIM)

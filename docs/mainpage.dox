@@ -45,7 +45,7 @@ Visit the \homepage{<b>official documentation page</b>} for information on all o
 
  */
 
-/** 
+/**
 \~english  \page p_basic_usage Basic Usage and Loading Environments
 
 To check out the plugins loaded type
@@ -88,7 +88,7 @@ openraveと似たコマンドに\openrave_py{openrave.py}というコマンド�
 
 */
 
-/** 
+/**
 \page writing_plugins Writing Plugins and Interfaces
 
 \section writing_plugins_contents Contents
@@ -152,7 +152,7 @@ include_directories(${OpenRAVE_INCLUDE_DIRS})
 link_directories(${OpenRAVE_LIBRARY_DIRS})
 add_library(plugincpp SHARED plugincpp.cpp)
 set_target_properties(plugincpp PROPERTIES COMPILE_FLAGS "${OpenRAVE_CXX_FLAGS}" LINK_FLAGS "${OpenRAVE_LINK_FLAGS}")
-target_link_libraries(plugincpp ${OpenRAVE_LIBRARIES})
+target_link_libraries(plugincpp PULIC ${OpenRAVE_LIBRARIES})
 \endverbatim
 
 \subsection writing_plugins_linux Other Build Systems
@@ -180,7 +180,7 @@ openrave --loadplugin $SOMEPATH/libplugincpp
 openrave --loadplugin $SOMEPATH/libplugincpp.so
 openrave --loadplugin ./libplugincpp.so
 \endverbatim
- where \c $SOMEPATH is the absolute/relative path of the shared object. 
+ where \c $SOMEPATH is the absolute/relative path of the shared object.
 
 - Another way is to load it from the C++/Python/APIs:<br/>
 \b C++

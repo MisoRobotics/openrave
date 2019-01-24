@@ -1,3 +1,4 @@
+*.pyc
 msvc_boost/
 msvc_collada/
 msvc_libxml2/
