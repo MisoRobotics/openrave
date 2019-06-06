@@ -2,6 +2,8 @@ cmake_minimum_required (VERSION 2.6.3) # using import/export targets, 2.6.3 for 
 project(OpenRAVE)
 set( CMAKE_ALLOW_LOOSE_LOOP_CONSTRUCTS TRUE )
 
+set (PACKAGE_LINKS "" CACHE INTERNAL "Package Links")
+
 # Define here the needed parameters
 set (OPENRAVE_VERSION_MAJOR 0)
 set (OPENRAVE_VERSION_MINOR 9)
@@ -176,7 +178,7 @@ set(OPENRAVE_LOCALE_INSTALL_ABSOLUTE_DIR "${CMAKE_INSTALL_PREFIX}/${OPENRAVE_LOC
 # The RPATH to be used when installing
 set(CMAKE_INSTALL_RPATH "${CMAKE_INSTALL_PREFIX}/lib${LIB_SUFFIX}" "${OPENRAVE_PLUGINS_INSTALL_ABSOLUTE_DIR}")
 
-#define OPENRAVE_PLUGINS_INSTALL_DIR 
+#define OPENRAVE_PLUGINS_INSTALL_DIR
 #define OPENRAVE_DATA_INSTALL_DIR "@CMAKE_INSTALL_PREFIX@/@OPENRAVE_DATA_INSTALL_DIR@"
 #define OPENRAVE_PYTHON_INSTALL_DIR "@CMAKE_INSTALL_PREFIX@/@OPENRAVE_PYTHON_INSTALL_DIR@"
 
@@ -275,7 +277,7 @@ if( MSVC )
     install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/msvc_include/stdint.h DESTINATION include/openrave-${OPENRAVE_VERSION_MAJOR}.${OPENRAVE_VERSION_MINOR} COMPONENT ${COMPONENT_PREFIX}dev)
     include_directories(${CMAKE_CURRENT_SOURCE_DIR}/msvc_include)
   endif()
-  
+
   # have to install dlls manually
   if( MSVC70 OR MSVC71 )
     set(MSVC_PREFIX "vc70")
@@ -287,7 +289,7 @@ if( MSVC )
     set(MSVC_PREFIX "vc100")
   endif()
   set(OPENRAVE_LIBRARY_SUFFIX "${OPENRAVE_SOVERSION}-${MSVC_PREFIX}-mt" CACHE STRING "Suffix to append to library names")
-  
+
   # force multi-threaded DLL boost
   set(Boost_USE_MULTITHREAD ON)
   set(Boost_USE_STATIC_LIBS OFF)
@@ -359,7 +361,7 @@ endif()
 if( OPT_PYTHON AND MSVC AND Boost_VERSION GREATER 104600 AND PYTHON_MAJORMINOR_VERSION STRGREATER "2.6")
   message(STATUS "Boost python library ${Boost_PYTHON_LIBRARY} might not be compiled for Python ${PYTHON_MAJORMINOR_VERSION}")
 endif()
-    
+
 set(OPENRAVE_BOOST_INCLUDE_DIRS)
 foreach(idir ${Boost_INCLUDE_DIRS})
   if( MSVC )
@@ -483,17 +485,17 @@ endif()
 
 if( ASSIMP_FOUND )
   message(STATUS "assimp version ${ASSIMP_VERSION}, ${ASSIMP_PACKAGE_VERSION}, ${ASSIMP_INCLUDE_DIRS}")
-  # For older versions of libassimp2, 
-  # like the one in Ubuntu 12.04 
-  set(CMAKE_REQUIRED_LIBRARIES assimp) 
-  check_cxx_source_compiles(" 
-  #include <assimp/Logger.h> 
-  int main() 
-  { 
-      Assimp::Logger::WARN; 
-      return 0; 
-  }" 
-  IS_ASSIMP_PRE_R896 
+  # For older versions of libassimp2,
+  # like the one in Ubuntu 12.04
+  set(CMAKE_REQUIRED_LIBRARIES assimp)
+  check_cxx_source_compiles("
+  #include <assimp/Logger.h>
+  int main()
+  {
+      Assimp::Logger::WARN;
+      return 0;
+  }"
+  IS_ASSIMP_PRE_R896
   )
   set(CMAKE_REQUIRED_LIBRARIES)
   if( ${ASSIMP_VERSION} STRGREATER "2.0.0" )
@@ -609,7 +611,7 @@ if( OPT_COLLADA )
       set(COLLADA_SUPPORT_WRITE_MEMORY 1)
     endif()
   endif()
-  
+
   find_package(ZLIB)
   if( NOT ZLIB_FOUND )
     message(STATUS "compiling zlib from souces")
@@ -967,10 +969,14 @@ if(CMAKE_CPACK_COMMAND AND UNIX AND OPT_BUILD_PACKAGES)
     set(CPACK_COMPONENT_OPENRAVE-MINIMAL_DESCRIPTION "Uninstall this package to remove all OpenRAVE installations")
     set(CPACK_COMPONENTS_ALL ${CPACK_COMPONENTS_ALL} openrave openrave-minimal openrave-python-minimal)
   endif()
-  
+
   #TODO: extra robot CAD model files from: https://openrave.svn.sourceforge.net/svnroot/openrave/data/robots
 
   set(DPUT_HOST "ppa:openrave/testing" CACHE STRING "PPA repository to upload the debian sources")
   include(CPack)
   include(DebSourcePPA)
+  configure_file(
+    ${CMAKE_SOURCE_DIR}/packaging/debian/package.links.in
+    ${CMAKE_BINARY_DIR}/packaging/debian/package.links
+    )
 endif()
