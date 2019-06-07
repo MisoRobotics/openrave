@@ -14,6 +14,8 @@
 #   _sympath: absolute path of the installed symlink
 
 macro(InstallSymlink _filepath _sympath)
+    set(oneValueArgs COMPONENT)
+    cmake_parse_arguments(INSTALL_SYMLINK "" "${oneValueArgs}" "" ${ARGN} )
     get_filename_component(_symname ${_sympath} NAME)
     get_filename_component(_installdir ${_sympath} PATH)
 
@@ -37,6 +39,26 @@ macro(InstallSymlink _filepath _sympath)
                                 \$ENV{DESTDIR}/${_installdir}/${_symname})
             endif ()
         ")
-        set(PACKAGE_LINKS "${PACKAGE_LINKS}${_sympath}	${_filepath}\n" CACHE INTERNAL "Package Links")
+
+        # Create a package.links file to be used as a Debian package control file.
+        if (DEFINED INSTALL_SYMLINK_COMPONENT)
+          set(XCPACK_DEBIAN_${INSTALL_SYMLINK_COMPONENT}_PACKAGE_LINKS "${XCPACK_DEBIAN_${INSTALL_SYMLINK_COMPONENT}_PACKAGE_LINKS};${_filepath}	${_sympath}" CACHE INTERNAL "${INSTALL_SYMLINK_COMPONENT} Package Links")
+          add_custom_target(
+            ${_symname}_link ALL
+            ${CMAKE_COMMAND} -E make_directory ${CMAKE_CURRENT_BINARY_DIR}/symlinks
+            COMMAND ${CMAKE_COMMAND} -E create_symlink ${_filepath} ${CMAKE_CURRENT_BINARY_DIR}/symlinks/${_symname})
+          if (IS_DIRECTORY ${_filepath})
+            install(DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/symlinks/${_symname}
+              DESTINATION ${_installdir}
+              COMPONENT ${INSTALL_SYMLINK_COMPONENT})
+          else()
+            install(
+              FILES ${CMAKE_CURRENT_BINARY_DIR}/symlinks/${_symname}
+              DESTINATION ${_installdir}
+              COMPONENT ${INSTALL_SYMLINK_COMPONENT})
+          endif()
+        else ()
+            set(XCPACK_DEBIAN_PACKAGE_LINKS "${XCPACK_DEBIAN_PACKAGE_LINKS};${_filepath}	${_sympath}" CACHE INTERNAL "Package Links")
+        endif ()
     endif ()
 endmacro(InstallSymlink)

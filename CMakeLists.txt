@@ -2,8 +2,6 @@ cmake_minimum_required (VERSION 2.6.3) # using import/export targets, 2.6.3 for 
 project(OpenRAVE)
 set( CMAKE_ALLOW_LOOSE_LOOP_CONSTRUCTS TRUE )
 
-set (PACKAGE_LINKS "" CACHE INTERNAL "Package Links")
-
 # Define here the needed parameters
 set (OPENRAVE_VERSION_MAJOR 0)
 set (OPENRAVE_VERSION_MINOR 9)
@@ -852,7 +850,7 @@ endif()
 if( OPT_BUILD_PACKAGE_DEFAULT AND OPENRAVE_BIN_SUFFIX )
   # create all the directories ahead of time, or otherwise WORKING_DIRECTORY will not work
   install(CODE "execute_process(COMMAND ${CMAKE_COMMAND} -E make_directory \${CMAKE_INSTALL_PREFIX}/bin COMMAND ${CMAKE_COMMAND} -E make_directory \${CMAKE_INSTALL_PREFIX}/lib${LIB_SUFFIX}/pkgconfig COMMAND ${CMAKE_COMMAND} -E make_directory \${CMAKE_INSTALL_PREFIX}/${BASH_COMPLETION_DIR})" COMPONENT openrave)
-  InstallSymlink(${CMAKE_INSTALL_PREFIX}/bin/openrave${OPENRAVE_BIN_SUFFIX}-config ${CMAKE_INSTALL_PREFIX}/bin/openrave-config)
+  InstallSymlink(${CMAKE_INSTALL_PREFIX}/bin/openrave${OPENRAVE_BIN_SUFFIX}-config ${CMAKE_INSTALL_PREFIX}/bin/openrave-config COMPONENT openrave)
 endif()
 
 configure_file("${CMAKE_CURRENT_SOURCE_DIR}/openrave-config.cmake.in" "${CMAKE_CURRENT_BINARY_DIR}/openrave-config.cmake" IMMEDIATE @ONLY)
@@ -868,9 +866,9 @@ if( UNIX OR CYGWIN)
   configure_file("${CMAKE_CURRENT_SOURCE_DIR}/openrave-core.pc.in" "${CMAKE_CURRENT_BINARY_DIR}/openrave${OPENRAVE_BIN_SUFFIX}-core.pc" @ONLY IMMEDIATE)
   install(FILES "${CMAKE_CURRENT_BINARY_DIR}/openrave${OPENRAVE_BIN_SUFFIX}-core.pc" DESTINATION lib${LIB_SUFFIX}/pkgconfig COMPONENT ${COMPONENT_PREFIX}dev)
   if( OPT_BUILD_PACKAGE_DEFAULT AND OPENRAVE_BIN_SUFFIX )
-    InstallSymlink(${CMAKE_INSTALL_PREFIX}/lib${LIB_SUFFIX}/pkgconfig/openrave${OPENRAVE_BIN_SUFFIX}.pc ${CMAKE_INSTALL_PREFIX}/lib${LIB_SUFFIX}/pkgconfig/openrave.pc)
+    InstallSymlink(${CMAKE_INSTALL_PREFIX}/lib${LIB_SUFFIX}/pkgconfig/openrave${OPENRAVE_BIN_SUFFIX}.pc ${CMAKE_INSTALL_PREFIX}/lib${LIB_SUFFIX}/pkgconfig/openrave.pc COMPONENT ${COMPONENT_PREFIX}dev)
 
-    InstallSymlink(${CMAKE_INSTALL_PREFIX}/lib${LIB_SUFFIX}/pkgconfig/openrave${OPENRAVE_BIN_SUFFIX}-core.pc ${CMAKE_INSTALL_PREFIX}/lib${LIB_SUFFIX}/pkgconfig/openrave-core.pc)
+    InstallSymlink(${CMAKE_INSTALL_PREFIX}/lib${LIB_SUFFIX}/pkgconfig/openrave${OPENRAVE_BIN_SUFFIX}-core.pc ${CMAKE_INSTALL_PREFIX}/lib${LIB_SUFFIX}/pkgconfig/openrave-core.pc COMPONENT ${COMPONENT_PREFIX}dev)
 
 
     if( BASH_COMPLETION_DIR )
@@ -880,7 +878,7 @@ if( UNIX OR CYGWIN)
 
       file(RELATIVE_PATH BASH_COMPLETION_RELATIVE_DIR ${BASH_COMPLETION_ABSOLUTE_DIR} ${BASH_COMPLETION_SHARE_DIR})
 
-      InstallSymlink(${BASH_COMPLETION_RELATIVE_DIR}/openrave_completion.bash ${BASH_COMPLETION_ABSOLUTE_DIR}/openrave_completion.bash)
+      InstallSymlink(${BASH_COMPLETION_RELATIVE_DIR}/openrave_completion.bash ${BASH_COMPLETION_ABSOLUTE_DIR}/openrave_completion.bash COMPONENT openrave)
 
     endif()
   endif()
@@ -947,9 +945,10 @@ if(CMAKE_CPACK_COMMAND AND UNIX AND OPT_BUILD_PACKAGES)
   # debian
   set(CPACK_DEBIAN_PACKAGE_PRIORITY optional)
   set(CPACK_DEBIAN_PACKAGE_SECTION devel)
-  set(CPACK_DEBIAN_PACKAGE_DEPENDS openrave-minimal)
+  #set(CPACK_DEBIAN_PACKAGE_DEPENDS openrave-minimal)
   set(CPACK_DEBIAN_PACKAGE_SUGGESTS cmake)
-  set(CPACK_DEBIAN_PACKAGE_RECOMMENDS ${CPACK_COMPONENTS_ALL})
+  string(REPLACE ";" ", " DEBIAN_PACK_RECOMMENDS "${CPACK_COMPONENTS_ALL}")
+  set(CPACK_DEBIAN_PACKAGE_RECOMMENDS "${DEBIAN_PACK_RECOMMENDS}")
   set(CPACK_DEBIAN_CMAKE_OPTIONS "-DBASH_COMPLETION_DIR=../etc/bash_completion.d -DOPT_DOUBLE_PRECISION=${OPT_DOUBLE_PRECISION} -DOPT_BUILD_PACKAGE_DEFAULT=${OPT_BUILD_PACKAGE_DEFAULT}")
   set(CPACK_DEBIAN_PACKAGE_REMOVE_SOURCE_FILES )
   set(CPACK_DEBIAN_PACKAGE_SOURCE_COPY "${CMAKE_SOURCE_DIR}/release/copydebfiles.py")
@@ -968,15 +967,38 @@ if(CMAKE_CPACK_COMMAND AND UNIX AND OPT_BUILD_PACKAGES)
     set(CPACK_COMPONENT_OPENRAVE-MINIMAL_DISPLAY_NAME "minimal shared files for all versions")
     set(CPACK_COMPONENT_OPENRAVE-MINIMAL_DESCRIPTION "Uninstall this package to remove all OpenRAVE installations")
     set(CPACK_COMPONENTS_ALL ${CPACK_COMPONENTS_ALL} openrave openrave-minimal openrave-python-minimal)
+
+    set(CPACK_DEB_COMPONENT_INSTALL ON)
+    set(CPACK_COMPONENTS_GROUPING IGNORE)
   endif()
 
   #TODO: extra robot CAD model files from: https://openrave.svn.sourceforge.net/svnroot/openrave/data/robots
 
+  if(DEFINED XCPACK_DEBIAN_PACKAGE_LINKS)
+    string(REGEX REPLACE "^;" "" PACKAGE_LINKS_SOURCE "${XCPACK_DEBIAN_PACKAGE_LINKS}")
+    string(REPLACE ";" "\n" PACKAGE_LINKS_SOURCE "${PACKAGE_LINKS_SOURCE}")
+    configure_file(
+      ${CMAKE_SOURCE_DIR}/packaging/debian/package.links.in
+      ${CMAKE_BINARY_DIR}/packaging/debian/package.links
+      )
+    set(CPACK_DEBIAN_PACKAGE_CONTROL_EXTRA "${CMAKE_BINARY_DIR}/packaging/debian/package.links")
+  endif()
+  foreach(cpack_component ${CPACK_COMPONENTS_ALL})
+    if(DEFINED XCPACK_DEBIAN_${cpack_component}_PACKAGE_LINKS)
+      string(TOUPPER "${cpack_component}" COMPONENT_UPPER)
+      string(REGEX REPLACE "^;" "" PACKAGE_LINKS_SOURCE "${XCPACK_DEBIAN_${cpack_component}_PACKAGE_LINKS}")
+      string(REPLACE ";" "\n" PACKAGE_LINKS_SOURCE "${PACKAGE_LINKS_SOURCE}")
+      configure_file(
+        ${CMAKE_SOURCE_DIR}/packaging/debian/package.links.in
+        ${CMAKE_BINARY_DIR}/packaging/debian/${cpack_component}.links
+        )
+      set(CPACK_DEBIAN_${COMPONENT_UPPER}_PACKAGE_CONTROL_EXTRA "${CMAKE_BINARY_DIR}/packaging/debian/${cpack_component}.links")
+    endif()
+  endforeach()
+  set(CPACK_SET_DESTDIR true)
+  set(CPACK_INSTALL_PREFIX ${CMAKE_INSTALL_PREFIX})
+
   set(DPUT_HOST "ppa:openrave/testing" CACHE STRING "PPA repository to upload the debian sources")
   include(CPack)
   include(DebSourcePPA)
-  configure_file(
-    ${CMAKE_SOURCE_DIR}/packaging/debian/package.links.in
-    ${CMAKE_BINARY_DIR}/packaging/debian/package.links
-    )
 endif()
