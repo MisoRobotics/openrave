@@ -42,7 +42,6 @@ macro(InstallSymlink _filepath _sympath)
 
         # Create a package.links file to be used as a Debian package control file.
         if (DEFINED INSTALL_SYMLINK_COMPONENT)
-          set(XCPACK_DEBIAN_${INSTALL_SYMLINK_COMPONENT}_PACKAGE_LINKS "${XCPACK_DEBIAN_${INSTALL_SYMLINK_COMPONENT}_PACKAGE_LINKS};${_filepath}	${_sympath}" CACHE INTERNAL "${INSTALL_SYMLINK_COMPONENT} Package Links")
           add_custom_target(
             ${_symname}_link ALL
             ${CMAKE_COMMAND} -E make_directory ${CMAKE_CURRENT_BINARY_DIR}/symlinks

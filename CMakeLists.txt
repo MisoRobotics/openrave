@@ -974,27 +974,6 @@ if(CMAKE_CPACK_COMMAND AND UNIX AND OPT_BUILD_PACKAGES)
 
   #TODO: extra robot CAD model files from: https://openrave.svn.sourceforge.net/svnroot/openrave/data/robots
 
-  if(DEFINED XCPACK_DEBIAN_PACKAGE_LINKS)
-    string(REGEX REPLACE "^;" "" PACKAGE_LINKS_SOURCE "${XCPACK_DEBIAN_PACKAGE_LINKS}")
-    string(REPLACE ";" "\n" PACKAGE_LINKS_SOURCE "${PACKAGE_LINKS_SOURCE}")
-    configure_file(
-      ${CMAKE_SOURCE_DIR}/packaging/debian/package.links.in
-      ${CMAKE_BINARY_DIR}/packaging/debian/package.links
-      )
-    set(CPACK_DEBIAN_PACKAGE_CONTROL_EXTRA "${CMAKE_BINARY_DIR}/packaging/debian/package.links")
-  endif()
-  foreach(cpack_component ${CPACK_COMPONENTS_ALL})
-    if(DEFINED XCPACK_DEBIAN_${cpack_component}_PACKAGE_LINKS)
-      string(TOUPPER "${cpack_component}" COMPONENT_UPPER)
-      string(REGEX REPLACE "^;" "" PACKAGE_LINKS_SOURCE "${XCPACK_DEBIAN_${cpack_component}_PACKAGE_LINKS}")
-      string(REPLACE ";" "\n" PACKAGE_LINKS_SOURCE "${PACKAGE_LINKS_SOURCE}")
-      configure_file(
-        ${CMAKE_SOURCE_DIR}/packaging/debian/package.links.in
-        ${CMAKE_BINARY_DIR}/packaging/debian/${cpack_component}.links
-        )
-      set(CPACK_DEBIAN_${COMPONENT_UPPER}_PACKAGE_CONTROL_EXTRA "${CMAKE_BINARY_DIR}/packaging/debian/${cpack_component}.links")
-    endif()
-  endforeach()
   set(CPACK_SET_DESTDIR true)
   set(CPACK_INSTALL_PREFIX ${CMAKE_INSTALL_PREFIX})
 
