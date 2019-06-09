@@ -176,7 +176,7 @@ set(OPENRAVE_LOCALE_INSTALL_ABSOLUTE_DIR "${CMAKE_INSTALL_PREFIX}/${OPENRAVE_LOC
 # The RPATH to be used when installing
 set(CMAKE_INSTALL_RPATH "${CMAKE_INSTALL_PREFIX}/lib${LIB_SUFFIX}" "${OPENRAVE_PLUGINS_INSTALL_ABSOLUTE_DIR}")
 
-#define OPENRAVE_PLUGINS_INSTALL_DIR 
+#define OPENRAVE_PLUGINS_INSTALL_DIR
 #define OPENRAVE_DATA_INSTALL_DIR "@CMAKE_INSTALL_PREFIX@/@OPENRAVE_DATA_INSTALL_DIR@"
 #define OPENRAVE_PYTHON_INSTALL_DIR "@CMAKE_INSTALL_PREFIX@/@OPENRAVE_PYTHON_INSTALL_DIR@"
 
@@ -275,7 +275,7 @@ if( MSVC )
     install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/msvc_include/stdint.h DESTINATION include/openrave-${OPENRAVE_VERSION_MAJOR}.${OPENRAVE_VERSION_MINOR} COMPONENT ${COMPONENT_PREFIX}dev)
     include_directories(${CMAKE_CURRENT_SOURCE_DIR}/msvc_include)
   endif()
-  
+
   # have to install dlls manually
   if( MSVC70 OR MSVC71 )
     set(MSVC_PREFIX "vc70")
@@ -287,7 +287,7 @@ if( MSVC )
     set(MSVC_PREFIX "vc100")
   endif()
   set(OPENRAVE_LIBRARY_SUFFIX "${OPENRAVE_SOVERSION}-${MSVC_PREFIX}-mt" CACHE STRING "Suffix to append to library names")
-  
+
   # force multi-threaded DLL boost
   set(Boost_USE_MULTITHREAD ON)
   set(Boost_USE_STATIC_LIBS OFF)
@@ -359,7 +359,7 @@ endif()
 if( OPT_PYTHON AND MSVC AND Boost_VERSION GREATER 104600 AND PYTHON_MAJORMINOR_VERSION STRGREATER "2.6")
   message(STATUS "Boost python library ${Boost_PYTHON_LIBRARY} might not be compiled for Python ${PYTHON_MAJORMINOR_VERSION}")
 endif()
-    
+
 set(OPENRAVE_BOOST_INCLUDE_DIRS)
 foreach(idir ${Boost_INCLUDE_DIRS})
   if( MSVC )
@@ -483,17 +483,17 @@ endif()
 
 if( ASSIMP_FOUND )
   message(STATUS "assimp version ${ASSIMP_VERSION}, ${ASSIMP_PACKAGE_VERSION}, ${ASSIMP_INCLUDE_DIRS}")
-  # For older versions of libassimp2, 
-  # like the one in Ubuntu 12.04 
-  set(CMAKE_REQUIRED_LIBRARIES assimp) 
-  check_cxx_source_compiles(" 
-  #include <assimp/Logger.h> 
-  int main() 
-  { 
-      Assimp::Logger::WARN; 
-      return 0; 
-  }" 
-  IS_ASSIMP_PRE_R896 
+  # For older versions of libassimp2,
+  # like the one in Ubuntu 12.04
+  set(CMAKE_REQUIRED_LIBRARIES assimp)
+  check_cxx_source_compiles("
+  #include <assimp/Logger.h>
+  int main()
+  {
+      Assimp::Logger::WARN;
+      return 0;
+  }"
+  IS_ASSIMP_PRE_R896
   )
   set(CMAKE_REQUIRED_LIBRARIES)
   if( ${ASSIMP_VERSION} STRGREATER "2.0.0" )
@@ -609,7 +609,7 @@ if( OPT_COLLADA )
       set(COLLADA_SUPPORT_WRITE_MEMORY 1)
     endif()
   endif()
-  
+
   find_package(ZLIB)
   if( NOT ZLIB_FOUND )
     message(STATUS "compiling zlib from souces")
@@ -849,8 +849,8 @@ else()
 endif()
 if( OPT_BUILD_PACKAGE_DEFAULT AND OPENRAVE_BIN_SUFFIX )
   # create all the directories ahead of time, or otherwise WORKING_DIRECTORY will not work
-  install(CODE "execute_process(COMMAND ${CMAKE_COMMAND} -E make_directory \${CMAKE_INSTALL_PREFIX}/bin COMMAND ${CMAKE_COMMAND} -E make_directory \${CMAKE_INSTALL_PREFIX}/lib${LIB_SUFFIX}/pkgconfig COMMAND ${CMAKE_COMMAND} -E make_directory \${CMAKE_INSTALL_PREFIX}/${BASH_COMPLETION_DIR})" COMPONENT openrave)
-  InstallSymlink(${CMAKE_INSTALL_PREFIX}/bin/openrave${OPENRAVE_BIN_SUFFIX}-config ${CMAKE_INSTALL_PREFIX}/bin/openrave-config)
+  install(CODE "execute_process(COMMAND ${CMAKE_COMMAND} -E make_directory \${CMAKE_INSTALL_PREFIX}/bin COMMAND ${CMAKE_COMMAND} -E make_directory \${CMAKE_INSTALL_PREFIX}/lib${LIB_SUFFIX}/pkgconfig COMMAND ${CMAKE_COMMAND} -E make_directory \${CMAKE_INSTALL_PREFIX}/${BASH_COMPLETION_DIR})" COMPONENT ${COMPONENT_PREFIX}base)
+  InstallSymlink(${CMAKE_INSTALL_PREFIX}/bin/openrave${OPENRAVE_BIN_SUFFIX}-config ${CMAKE_INSTALL_PREFIX}/bin/openrave-config COMPONENT ${COMPONENT_PREFIX}base)
 endif()
 
 configure_file("${CMAKE_CURRENT_SOURCE_DIR}/openrave-config.cmake.in" "${CMAKE_CURRENT_BINARY_DIR}/openrave-config.cmake" IMMEDIATE @ONLY)
@@ -866,9 +866,9 @@ if( UNIX OR CYGWIN)
   configure_file("${CMAKE_CURRENT_SOURCE_DIR}/openrave-core.pc.in" "${CMAKE_CURRENT_BINARY_DIR}/openrave${OPENRAVE_BIN_SUFFIX}-core.pc" @ONLY IMMEDIATE)
   install(FILES "${CMAKE_CURRENT_BINARY_DIR}/openrave${OPENRAVE_BIN_SUFFIX}-core.pc" DESTINATION lib${LIB_SUFFIX}/pkgconfig COMPONENT ${COMPONENT_PREFIX}dev)
   if( OPT_BUILD_PACKAGE_DEFAULT AND OPENRAVE_BIN_SUFFIX )
-    InstallSymlink(${CMAKE_INSTALL_PREFIX}/lib${LIB_SUFFIX}/pkgconfig/openrave${OPENRAVE_BIN_SUFFIX}.pc ${CMAKE_INSTALL_PREFIX}/lib${LIB_SUFFIX}/pkgconfig/openrave.pc)
+    InstallSymlink(${CMAKE_INSTALL_PREFIX}/lib${LIB_SUFFIX}/pkgconfig/openrave${OPENRAVE_BIN_SUFFIX}.pc ${CMAKE_INSTALL_PREFIX}/lib${LIB_SUFFIX}/pkgconfig/openrave.pc COMPONENT ${COMPONENT_PREFIX}dev)
 
-    InstallSymlink(${CMAKE_INSTALL_PREFIX}/lib${LIB_SUFFIX}/pkgconfig/openrave${OPENRAVE_BIN_SUFFIX}-core.pc ${CMAKE_INSTALL_PREFIX}/lib${LIB_SUFFIX}/pkgconfig/openrave-core.pc)
+    InstallSymlink(${CMAKE_INSTALL_PREFIX}/lib${LIB_SUFFIX}/pkgconfig/openrave${OPENRAVE_BIN_SUFFIX}-core.pc ${CMAKE_INSTALL_PREFIX}/lib${LIB_SUFFIX}/pkgconfig/openrave-core.pc COMPONENT ${COMPONENT_PREFIX}dev)
 
 
     if( BASH_COMPLETION_DIR )
@@ -878,7 +878,7 @@ if( UNIX OR CYGWIN)
 
       file(RELATIVE_PATH BASH_COMPLETION_RELATIVE_DIR ${BASH_COMPLETION_ABSOLUTE_DIR} ${BASH_COMPLETION_SHARE_DIR})
 
-      InstallSymlink(${BASH_COMPLETION_RELATIVE_DIR}/openrave_completion.bash ${BASH_COMPLETION_ABSOLUTE_DIR}/openrave_completion.bash)
+      InstallSymlink(${BASH_COMPLETION_RELATIVE_DIR}/openrave_completion.bash ${BASH_COMPLETION_ABSOLUTE_DIR}/openrave_completion.bash COMPONENT ${COMPONENT_PREFIX}base)
 
     endif()
   endif()
@@ -945,9 +945,10 @@ if(CMAKE_CPACK_COMMAND AND UNIX AND OPT_BUILD_PACKAGES)
   # debian
   set(CPACK_DEBIAN_PACKAGE_PRIORITY optional)
   set(CPACK_DEBIAN_PACKAGE_SECTION devel)
-  set(CPACK_DEBIAN_PACKAGE_DEPENDS openrave-minimal)
+  #set(CPACK_DEBIAN_PACKAGE_DEPENDS openrave-minimal)
   set(CPACK_DEBIAN_PACKAGE_SUGGESTS cmake)
-  set(CPACK_DEBIAN_PACKAGE_RECOMMENDS ${CPACK_COMPONENTS_ALL})
+  string(REPLACE ";" ", " DEBIAN_PACK_RECOMMENDS "${CPACK_COMPONENTS_ALL}")
+  set(CPACK_DEBIAN_PACKAGE_RECOMMENDS "${DEBIAN_PACK_RECOMMENDS}")
   set(CPACK_DEBIAN_CMAKE_OPTIONS "-DBASH_COMPLETION_DIR=../etc/bash_completion.d -DOPT_DOUBLE_PRECISION=${OPT_DOUBLE_PRECISION} -DOPT_BUILD_PACKAGE_DEFAULT=${OPT_BUILD_PACKAGE_DEFAULT}")
   set(CPACK_DEBIAN_PACKAGE_REMOVE_SOURCE_FILES )
   set(CPACK_DEBIAN_PACKAGE_SOURCE_COPY "${CMAKE_SOURCE_DIR}/release/copydebfiles.py")
@@ -966,9 +967,15 @@ if(CMAKE_CPACK_COMMAND AND UNIX AND OPT_BUILD_PACKAGES)
     set(CPACK_COMPONENT_OPENRAVE-MINIMAL_DISPLAY_NAME "minimal shared files for all versions")
     set(CPACK_COMPONENT_OPENRAVE-MINIMAL_DESCRIPTION "Uninstall this package to remove all OpenRAVE installations")
     set(CPACK_COMPONENTS_ALL ${CPACK_COMPONENTS_ALL} openrave openrave-minimal openrave-python-minimal)
+
+    set(CPACK_DEB_COMPONENT_INSTALL ON)
+    set(CPACK_COMPONENTS_GROUPING IGNORE)
   endif()
-  
+
   #TODO: extra robot CAD model files from: https://openrave.svn.sourceforge.net/svnroot/openrave/data/robots
+
+  set(CPACK_SET_DESTDIR true)
+  set(CPACK_INSTALL_PREFIX ${CMAKE_INSTALL_PREFIX})
 
   set(DPUT_HOST "ppa:openrave/testing" CACHE STRING "PPA repository to upload the debian sources")
   include(CPack)

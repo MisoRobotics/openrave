@@ -4,11 +4,11 @@ set(HAVE_ALL_PYTHON_HEADERS ${HAVE_ALL_PYTHON_HEADERS} PARENT_SCOPE)
 if( OPT_BUILD_PACKAGE_DEFAULT )
   set(OPENRAVEPY_EGG "${CMAKE_CURRENT_BINARY_DIR}/openravepy.egg-info")
   configure_file("${CMAKE_CURRENT_SOURCE_DIR}/openravepy.egg-info.in" "${OPENRAVEPY_EGG}" IMMEDIATE @ONLY)
-  install(FILES "${OPENRAVEPY_EGG}" DESTINATION ${OPENRAVE_PYTHON_INSTALL_DIR}  COMPONENT openrave-python-minimal)
-  
+  install(FILES "${OPENRAVEPY_EGG}" DESTINATION ${OPENRAVE_PYTHON_INSTALL_DIR}  COMPONENT ${COMPONENT_PREFIX}python)
+
   set(OPENRAVEPY_INIT "${CMAKE_CURRENT_BINARY_DIR}/__init__.py")
   configure_file("${CMAKE_CURRENT_SOURCE_DIR}/__init__.py.in" "${OPENRAVEPY_INIT}" IMMEDIATE @ONLY)
-  install(FILES ${OPENRAVEPY_INIT} DESTINATION ${OPENRAVEPY_INSTALL_DIR}  COMPONENT openrave-python-minimal)
+  install(FILES ${OPENRAVEPY_INIT} DESTINATION ${CMAKE_INSTALL_PREFIX}/${OPENRAVEPY_INSTALL_DIR}  COMPONENT openrave-python-minimal)
   set(CPACK_COMPONENT_OPENRAVE-PYTHON-MINIMAL_DISPLAY_NAME "Python ${PYTHON_MAJORMINOR_VERSION} bindings minimal subset" PARENT_SCOPE)
   set(CPACK_COMPONENT_OPENRAVE-PYTHON-MINIMAL_DESCRIPTION "Uninstall this package to remove all python bindings of all installations" PARENT_SCOPE)
   set(CPACK_COMPONENT_OPENRAVE-PYTHON-MINIMAL_DEPENDS openrave-minimal PARENT_SCOPE)
@@ -38,13 +38,22 @@ set(CPACK_COMPONENT_${COMPONENT_PREFIX_UPPER}PYTHON_SUGGESTS ipython python-qt4 
 if( OPT_BUILD_PACKAGE_DEFAULT AND OPENRAVE_BIN_SUFFIX )
   install(CODE "execute_process(COMMAND ${CMAKE_COMMAND} -E make_directory \${CMAKE_INSTALL_PREFIX}/${OPENRAVEPY_INSTALL_DIR})" COMPONENT openrave)
   InstallSymlink(${CMAKE_INSTALL_PREFIX}/bin/openrave${OPENRAVE_BIN_SUFFIX}.py
-                 ${CMAKE_INSTALL_PREFIX}/bin/openrave.py)
+                 ${CMAKE_INSTALL_PREFIX}/bin/openrave.py
+                 COMPONENT ${COMPONENT_PREFIX}python)
   InstallSymlink(${CMAKE_INSTALL_PREFIX}/bin/openrave${OPENRAVE_BIN_SUFFIX}-robot.py
-                 ${CMAKE_INSTALL_PREFIX}/bin/openrave-robot.py)
+                 ${CMAKE_INSTALL_PREFIX}/bin/openrave-robot.py
+                 COMPONENT ${COMPONENT_PREFIX}python)
   InstallSymlink(${CMAKE_INSTALL_PREFIX}/bin/openrave${OPENRAVE_BIN_SUFFIX}-createplugin.py
-                 ${CMAKE_INSTALL_PREFIX}/bin/openrave-createplugin.py)
+                 ${CMAKE_INSTALL_PREFIX}/bin/openrave-createplugin.py
+                 COMPONENT ${COMPONENT_PREFIX}python)
   InstallSymlink(${CMAKE_INSTALL_PREFIX}/${OPENRAVEPY_INSTALL_DIR}/${OPENRAVEPY_VER_NAME}
-                 ${CMAKE_INSTALL_PREFIX}/${OPENRAVEPY_INSTALL_DIR}/_openravepy_)
+                 /usr/${OPENRAVEPY_INSTALL_DIR}/_openravepy_
+                 COMPONENT ${COMPONENT_PREFIX}python)
+  if(NOT "${CMAKE_INSTALL_PREFIX}" MATCHES "^/+usr/*$")
+    InstallSymlink(${CMAKE_INSTALL_PREFIX}/${OPENRAVEPY_INSTALL_DIR}/__init__.py
+                   /usr/${OPENRAVEPY_INSTALL_DIR}/__init__.py
+                   COMPONENT openrave-python-minimal)
+  endif()
 endif()
 
 # ikfast component
