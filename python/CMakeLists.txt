@@ -47,8 +47,13 @@ if( OPT_BUILD_PACKAGE_DEFAULT AND OPENRAVE_BIN_SUFFIX )
                  ${CMAKE_INSTALL_PREFIX}/bin/openrave-createplugin.py
                  COMPONENT ${COMPONENT_PREFIX}python)
   InstallSymlink(${CMAKE_INSTALL_PREFIX}/${OPENRAVEPY_INSTALL_DIR}/${OPENRAVEPY_VER_NAME}
-                 ${CMAKE_INSTALL_PREFIX}/${OPENRAVEPY_INSTALL_DIR}/_openravepy_
+                 /usr/${OPENRAVEPY_INSTALL_DIR}/_openravepy_
                  COMPONENT ${COMPONENT_PREFIX}python)
+  if(NOT "${CMAKE_INSTALL_PREFIX}" MATCHES "^/+usr/*$")
+    InstallSymlink(${CMAKE_INSTALL_PREFIX}/${OPENRAVEPY_INSTALL_DIR}/__init__.py
+                   /usr/${OPENRAVEPY_INSTALL_DIR}/__init__.py
+                   COMPONENT ${COMPONENT_PREFIX}python)
+  endif()
 endif()
 
 # ikfast component
