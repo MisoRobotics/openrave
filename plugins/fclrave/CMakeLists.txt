@@ -78,8 +78,8 @@ if( FCL_FOUND )
   else()
     message(STATUS "Could not find FCL. Please install FCL (https://github.com/flexible-collision-library/fcl)")
   endif()
-
   set(CPACK_COMPONENT_${COMPONENT_PREFIX_UPPER}PLUGIN-FCLRAVE_DISPLAY_NAME "Plugin for Flexible Collision Library (fcl) Collision" PARENT_SCOPE)
+  set(CPACK_COMPONENT_${COMPONENT_PREFIX_UPPER}PLUGIN-FCLRAVE_PACKAGE_DEPENDS "libfcl0.5" PARENT_SCOPE)
   set(PLUGIN_COMPONENT ${COMPONENT_PREFIX}plugin-fclrave PARENT_SCOPE)
 endif()
 
