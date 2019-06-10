@@ -37,11 +37,10 @@ deb:
 
 install-deb:
 	dpkg -i \
-		$(BUILD_DIR)/OpenRAVE-0.9.0.0-Linux-openrave0.9-dp.deb\
-		$(BUILD_DIR)/OpenRAVE-0.9.0.0-Linux-openrave0.9-dp-base.deb \
-		$(BUILD_DIR)/OpenRAVE-0.9.0.0-Linux-openrave0.9-dp-plugins-base.deb \
-		$(BUILD_DIR)/OpenRAVE-0.9.0.0-Linux-openrave0.9-dp-plugin-fclrave.deb \
-		$(BUILD_DIR)/OpenRAVE-0.9.0.0-Linux-openrave0.9-dp-python.deb \
+		$(BUILD_DIR)/OpenRAVE-0.9.0.0-Linux-base.deb \
+		$(BUILD_DIR)/OpenRAVE-0.9.0.0-Linux-plugin-fclrave.deb \
+		$(BUILD_DIR)/OpenRAVE-0.9.0.0-Linux-plugins-base.deb \
+		$(BUILD_DIR)/OpenRAVE-0.9.0.0-Linux-python.deb \
 		$(BUILD_DIR)/OpenRAVE-0.9.0.0-Linux-openrave.deb \
 		$(BUILD_DIR)/OpenRAVE-0.9.0.0-Linux-openrave-minimal.deb \
 		$(BUILD_DIR)/OpenRAVE-0.9.0.0-Linux-openrave-python-minimal.deb

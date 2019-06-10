@@ -14,8 +14,8 @@
 #   _sympath: absolute path of the installed symlink
 
 macro(InstallSymlink _filepath _sympath)
-    set(oneValueArgs COMPONENT)
-    cmake_parse_arguments(INSTALL_SYMLINK "" "${oneValueArgs}" "" ${ARGN} )
+    set(_onevalueargs COMPONENT)
+    cmake_parse_arguments(INSTALL_SYMLINK "" "${_onevalueargs}" "" ${ARGN} )
     get_filename_component(_symname ${_sympath} NAME)
     get_filename_component(_installdir ${_sympath} PATH)
 
@@ -42,22 +42,22 @@ macro(InstallSymlink _filepath _sympath)
 
         # Create a package.links file to be used as a Debian package control file.
         if (DEFINED INSTALL_SYMLINK_COMPONENT)
+          execute_process(COMMAND "date" "+%s%N" OUTPUT_VARIABLE _timestamp_now OUTPUT_STRIP_TRAILING_WHITESPACE)
+          set(_symlink_dir ${CMAKE_CURRENT_BINARY_DIR}/symlinks/${_timestamp_now})
           add_custom_target(
-            ${_symname}_link ALL
-            ${CMAKE_COMMAND} -E make_directory ${CMAKE_CURRENT_BINARY_DIR}/symlinks
-            COMMAND ${CMAKE_COMMAND} -E create_symlink ${_filepath} ${CMAKE_CURRENT_BINARY_DIR}/symlinks/${_symname})
+            ${_symname}_${_timestamp_now}_link_ ALL
+            ${CMAKE_COMMAND} -E make_directory ${_symlink_dir}
+            COMMAND ${CMAKE_COMMAND} -E create_symlink ${_filepath} ${_symlink_dir}/${_symname})
           if (IS_DIRECTORY ${_filepath})
-            install(DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/symlinks/${_symname}
+            install(DIRECTORY ${_symlink_dir}/${_symname}
               DESTINATION ${_installdir}
               COMPONENT ${INSTALL_SYMLINK_COMPONENT})
           else()
             install(
-              FILES ${CMAKE_CURRENT_BINARY_DIR}/symlinks/${_symname}
+              FILES ${_symlink_dir}/${_symname}
               DESTINATION ${_installdir}
               COMPONENT ${INSTALL_SYMLINK_COMPONENT})
           endif()
-        else ()
-            set(XCPACK_DEBIAN_PACKAGE_LINKS "${XCPACK_DEBIAN_PACKAGE_LINKS};${_filepath}	${_sympath}" CACHE INTERNAL "Package Links")
         endif ()
     endif ()
 endmacro(InstallSymlink)
